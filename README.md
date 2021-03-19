@@ -10,3 +10,4 @@
 # To find flux distribution at quadrature points:
 #   obj.getFlux()
 # Sample .inp files are provided. Each problem with different sets & types of boundary conditions needs complementary files, such as ProbXQ8Related.m
+# A main() function is provided as an example to plot the temperature distribution and the flux distribution.

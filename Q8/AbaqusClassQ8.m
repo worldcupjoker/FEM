@@ -1,11 +1,11 @@
 % Copyright, 2021, (Ted) Zhongkun Zhan, all rights reserved.
-% File name: AbaqusClass.m
+% File name: AbaqusClassQ8.m
 % This file solves a 2 demensional stead state heat transfer problem using
 % finite element method with 8-node quadrilateral element type.
 % [Input]: file name.
 
 classdef AbaqusClassQ8 < handle
-    properties (Access = private)
+    properties %(Access = private)
     % nodes - 2D array with 3 columns - node no., x-coordinate, y-coordinate
     % and rows = no. of nodes.
     nodeGlobal;
@@ -68,11 +68,11 @@ classdef AbaqusClassQ8 < handle
             obj.K = constants(1);
             
             if (strfind(fileName, 'Prob1') == 1)
-                obj.tempObj = Prob1Q8Related(fileName);
+                obj.tempObj = Prob1Related(fileName);
             elseif ((strfind(fileName, 'Prob2') == 1))
-                obj.tempObj = Prob2Q8Related(fileName);
+                obj.tempObj = Prob2Related(fileName);
             elseif ((strfind(fileName, 'Prob3') == 1))
-                obj.tempObj = Prob3Q8Related(fileName);
+                obj.tempObj = Prob3Related(fileName);
             end
             
             mainCalculation(obj);
@@ -202,7 +202,7 @@ classdef AbaqusClassQ8 < handle
                 
                 % Iterate through 4 quadrature points in each elements.
                 for j = 1 : 4
-                    fluxLocal = localFlux(xy, obj.N_a, obj.N_b, obj.N_c, obj.N_d, obj.G_a, obj.G_b, obj.G_c, obj.G_d, localTemp, obj.K);
+                    fluxLocal = localFluxQ8(xy, obj.N_a, obj.N_b, obj.N_c, obj.N_d, obj.G_a, obj.G_b, obj.G_c, obj.G_d, localTemp, obj.K);
                     obj.flux(i * 4 - 3 + j - 1, :) = fluxLocal(j, :);
                 end
             end
@@ -237,23 +237,24 @@ classdef AbaqusClassQ8 < handle
         end
         
         % Get Neumann BC. (private)
-        function force_n = getNeumannBC(obj,elementNum, xy, L)
+        function force_n = getNeumannBC(obj, elementNum, xy, L)
             force_n = zeros(obj.totalNodes, 1);
+            currentElement = obj.elements(elementNum, :);
             
             % Go through each Neumann BC for each element.
             for i = 1 : obj.tempObj.getnBCNum()
                 
                 % Check if a node is on the boundary.
                 % Use a 1x2 matrix to store the node number.
-                % Each element can only have 0 or 3 nodes on a certain
-                % boundary, but you ignore the middle node. So break the
+                % Each element can only have 0, 1, or 2 corner nodes on a
+                % certain boundary.
                 % loop after k reaches 3.
-                currentElement = obj.elements(elementNum, :);
                 currentBoundary = obj.tempObj.getNBC(i);
                 currentFlux = obj.tempObj.getFlux(i);
                 record = zeros(1, 2);
                 k = 1;
                 for j = 1 : 4
+                    currentElement(1, j + 1);%
                     if ismember(currentElement(j + 1), currentBoundary) == 1
                         record(1, k) = j;
                         k = k + 1;
@@ -265,10 +266,10 @@ classdef AbaqusClassQ8 < handle
                 
                 recordState = record(1) * record(2);
                 if recordState ~= 0
-                    force_n = force_n + force2PointGauss(xy, L, recordState, currentFlux);
+                    force_n = force_n + force2PointGaussQ8(xy, L, recordState, currentFlux);
                 end
-                force_n = -1 * force_n;
             end
+            force_n = -1 * force_n; % !!!!! here not above.
             return
         end
         
@@ -288,7 +289,7 @@ classdef AbaqusClassQ8 < handle
             % Go through each source for each element.
             for i = 1 : obj.tempObj.getSourceNum()
                 currentSource = obj.tempObj.getSource(i);
-                force_s = force_s + source2PointGauss(obj.N_a, obj.N_b, obj.N_c, obj.N_d, detJ_a, detJ_b, detJ_c, detJ_d, L, xy, currentSource); 
+                force_s = force_s + source2PointGaussQ8(obj.N_a, obj.N_b, obj.N_c, obj.N_d, detJ_a, detJ_b, detJ_c, detJ_d, L, xy, currentSource); 
             end
             return
         end

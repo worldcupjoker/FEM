@@ -2,10 +2,14 @@
 % File name: AbaqusClassQ8.m
 % This file solves a 2 demensional stead state heat transfer problem using
 % finite element method with 8-node quadrilateral element type.
-% [Input]: file name.
+% Input: [file name]
 
 classdef AbaqusClassQ8 < handle
-    properties %(Access = private)
+    properties (Access = private)
+    
+    % main function run time.
+    time;
+    
     % nodes - 2D array with 3 columns - node no., x-coordinate, y-coordinate
     % and rows = no. of nodes.
     nodeGlobal;
@@ -17,7 +21,7 @@ classdef AbaqusClassQ8 < handle
     totalElements;
 
     % Conductivity
-    K
+    K;
     
     % Matrices
     K_global;
@@ -79,6 +83,9 @@ classdef AbaqusClassQ8 < handle
         end
         
         % Get temperature at each node.
+        % Matlab syntax: a function (other than the constructor) takes at
+        % least one input, and the first input has to be the current class
+        % (object) itself.
         function T = getT(obj)
             T = obj.temperature;
             return
@@ -96,12 +103,27 @@ classdef AbaqusClassQ8 < handle
             return
         end
         
+        % Get run time.
+        function t = getTime(obj)
+            t = obj.time;
+            return
+        end
+        
+        % Get elements.
+        function ele = getElements(obj)
+            ele = obj.elements;
+            return
+        end
+        
     end
     
     methods (Access = private)
         
         % Main calculation (private).
         function mainCalculation(obj)
+            
+            % Start timing.
+            %tic
             
             % Set the sizes of matrices.
             obj.K_global = zeros(obj.totalNodes, obj.totalNodes);
@@ -181,7 +203,7 @@ classdef AbaqusClassQ8 < handle
                     count = count + 1;
                 end
             end
-            solution = obj.K_global\RHS;
+            solution = obj.K_global \ RHS;
             solution = finalL * solution;
             obj.temperature = obj.temperature + solution;
             
@@ -202,38 +224,40 @@ classdef AbaqusClassQ8 < handle
                 
                 % Iterate through 4 quadrature points in each elements.
                 for j = 1 : 4
-                    fluxLocal = localFluxQ8(xy, obj.N_a, obj.N_b, obj.N_c, obj.N_d, obj.G_a, obj.G_b, obj.G_c, obj.G_d, localTemp, obj.K);
+                    fluxLocal = localFlux(xy, obj.N_a, obj.N_b, obj.N_c, obj.N_d, obj.G_a, obj.G_b, obj.G_c, obj.G_d, localTemp, obj.K);
                     obj.flux(i * 4 - 3 + j - 1, :) = fluxLocal(j, :);
                 end
             end
             
+            % End timing
+            %obj.time = toc;            
         end
         
         % Get stifness matrix.
         % Private.
         function K_el = getStiffnessMatrix(obj, xy, L)
 
-        % Find the jacobian matrices and their determinants.
-        J_a = obj.G_a * xy;
-        detJ_a = det(J_a);
-        J_b = obj.G_b * xy;
-        detJ_b = det(J_b);
-        J_c = obj.G_c * xy;
-        detJ_c = det(J_c);
-        J_d = obj.G_d * xy;
-        detJ_d = det(J_d);
+            % Find the jacobian matrices and their determinants.
+            J_a = obj.G_a * xy;
+            detJ_a = det(J_a);
+            J_b = obj.G_b * xy;
+            detJ_b = det(J_b);
+            J_c = obj.G_c * xy;
+            detJ_c = det(J_c);
+            J_d = obj.G_d * xy;
+            detJ_d = det(J_d);
 
-        % Find B matrices.
-        B_a = inv(J_a) * obj.G_a;
-        B_b = inv(J_b) * obj.G_b;
-        B_c = inv(J_c) * obj.G_c;
-        B_d = inv(J_d) * obj.G_d;
+            % Find B matrices.
+            B_a = inv(J_a) * obj.G_a;
+            B_b = inv(J_b) * obj.G_b;
+            B_c = inv(J_c) * obj.G_c;
+            B_d = inv(J_d) * obj.G_d;
         
-        K_el = B_a.' * obj.K * B_a * detJ_a + B_b.' * obj.K * B_b * detJ_b + B_c.' * obj.K * B_c * detJ_c + B_d.' * obj.K * B_d * detJ_d;
+            K_el = B_a.' * obj.K * B_a * detJ_a + B_b.' * obj.K * B_b * detJ_b + B_c.' * obj.K * B_c * detJ_c + B_d.' * obj.K * B_d * detJ_d;
         
-        % Transfer local nodes into global nodes.
-        K_el = L.' * K_el * L;
-        return
+            % Transfer local nodes into global nodes.
+            K_el = L.' * K_el * L;
+            return
         end
         
         % Get Neumann BC. (private)

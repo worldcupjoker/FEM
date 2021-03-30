@@ -13,5 +13,5 @@
 # A main() function is provided as an example to plot the temperature distribution and the flux distribution.
 ![Prob3Q8_163](https://user-images.githubusercontent.com/73008183/111817418-5e266f00-88b4-11eb-825a-4420a3ec4cf9.png)
 ![image](https://user-images.githubusercontent.com/73008183/111817573-88782c80-88b4-11eb-938c-3e2e9415394f.png)
-![image](https://user-images.githubusercontent.com/73008183/111817651-a34aa100-88b4-11eb-8a81-3ed3a5dee553.png)
-![image](https://user-images.githubusercontent.com/73008183/111817735-bfe6d900-88b4-11eb-97b6-09941fba84d0.png)
+![image](https://user-images.githubusercontent.com/73008183/113001421-cbe95b00-913e-11eb-920a-a6e676200572.png)
+![image](https://user-images.githubusercontent.com/73008183/113001535-e3284880-913e-11eb-840a-2bd7f2e624a7.png)

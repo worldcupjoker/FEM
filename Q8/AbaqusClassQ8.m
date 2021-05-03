@@ -223,8 +223,8 @@ classdef AbaqusClassQ8 < handle
                 end
                 
                 % Iterate through 4 quadrature points in each elements.
+                fluxLocal = localFlux(xy, obj.N_a, obj.N_b, obj.N_c, obj.N_d, obj.G_a, obj.G_b, obj.G_c, obj.G_d, localTemp, obj.K);
                 for j = 1 : 4
-                    fluxLocal = localFlux(xy, obj.N_a, obj.N_b, obj.N_c, obj.N_d, obj.G_a, obj.G_b, obj.G_c, obj.G_d, localTemp, obj.K);
                     obj.flux(i * 4 - 3 + j - 1, :) = fluxLocal(j, :);
                 end
             end

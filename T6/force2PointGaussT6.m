@@ -20,6 +20,12 @@ if recordState == 2
     % L2 = 1 / 2 * (xi + 1)
     % _L1, _L2 are partial derivatives.
     % Don't forget to multiply 0.5 to the integral.
+    % The 0.5 is here because you mapped L to t. L ranges from 0 ot 1, and
+    % t ranges from -1 to 1. There has to be a (b - a) / 2 term in front of
+    % the integral. Other sources you see ignored that term, and that's the
+    % reason they used 96 in the denominator instead of 48. In Q8 elements,
+    % eta and xi range from -1 to 1, and t also range from -1 to 1. As a
+    % result, (b - a) / 2 term is 1.
     N1 = getShapeFuncT6(1 - 0.5 * (xia + 1), 0.5 * (xia + 1), true);
     N1_L2 = getShapeFuncT6(1 - 0.5 * (xia + 1), 0.5 * (xia + 1), false);
     x1 = N1 * xy(:, 1);

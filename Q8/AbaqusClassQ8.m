@@ -72,11 +72,11 @@ classdef AbaqusClassQ8 < handle
             obj.K = constants(1);
             
             if (strfind(fileName, 'Prob1') == 1)
-                obj.tempObj = Prob1Related(fileName);
+                obj.tempObj = Prob1Q8Related(fileName);
             elseif ((strfind(fileName, 'Prob2') == 1))
-                obj.tempObj = Prob2Related(fileName);
+                obj.tempObj = Prob2Q8Related(fileName);
             elseif ((strfind(fileName, 'Prob3') == 1))
-                obj.tempObj = Prob3Related(fileName);
+                obj.tempObj = Prob3Q8Related(fileName);
             end
             
             mainCalculation(obj);
@@ -290,7 +290,7 @@ classdef AbaqusClassQ8 < handle
                 
                 recordState = record(1) * record(2);
                 if recordState ~= 0
-                    force_n = force_n + force2PointGaussQ8(xy, L, recordState, currentFlux);
+                    force_n = force_n + force2PointGauss(xy, L, recordState, currentFlux);
                 end
             end
             force_n = -1 * force_n; % !!!!! here not above.
@@ -313,7 +313,7 @@ classdef AbaqusClassQ8 < handle
             % Go through each source for each element.
             for i = 1 : obj.tempObj.getSourceNum()
                 currentSource = obj.tempObj.getSource(i);
-                force_s = force_s + source2PointGaussQ8(obj.N_a, obj.N_b, obj.N_c, obj.N_d, detJ_a, detJ_b, detJ_c, detJ_d, L, xy, currentSource); 
+                force_s = force_s + source2PointGauss(obj.N_a, obj.N_b, obj.N_c, obj.N_d, detJ_a, detJ_b, detJ_c, detJ_d, L, xy, currentSource); 
             end
             return
         end
